@@ -1220,7 +1220,7 @@
           </div>
 
           <div style="margin-top:auto;">
-            <button class="btn-action" style="width:100%; background:var(--teal); color:#fff; border:none; font-size:11px;">EXPORT STRATEGIC BRIEF</button>
+            <button id="export_btn" class="btn-action" style="width:100%; background:var(--teal); color:#fff; border:none; font-size:11px;">EXPORT STRATEGIC BRIEF</button>
           </div>
         </div>
       </div>
@@ -1867,7 +1867,51 @@
     }
 
     // ─── EVENT HANDLERS ──────────────────────────────────────────────────────
+    function downloadStrategicBrief() {
+      const activeSite = document.getElementById('active_site_name').textContent;
+      const ops = store.results.ops;
+      const spread = document.getElementById('elasticity_spread').textContent;
+      const npv = document.getElementById('npv_display').textContent;
+      const advisory = document.getElementById('strat_recommendation').textContent;
+      
+      const content = `
+BLUEVALUE INTELLIGENCE — STRATEGIC ADVISORY BRIEF
+--------------------------------------------------
+DATE: ${new Date().toLocaleDateString()}
+FACILITY: ${activeSite}
+SCENARIO: ${store.scenario.toUpperCase()}
+
+EXECUTIVE SUMMARY:
+Operational Performance Score (OPS): ${ops}
+Implied Spread Adjustment: ${spread}
+Estimated 5-Year Scenario NPV: ${npv}
+
+STRATEGIC ADVISORY MEMO:
+${advisory.trim()}
+
+--------------------------------------------------
+INTERNAL USE ONLY — BNP Paribas Global Markets
+Sustainable Finance Engineering
+      `;
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `BlueValue_Strategy_Brief_${activeSite.replace(/\s+/g, '_')}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     function bindEvents() {
+      // Export Button
+      const exportBtn = document.getElementById('export_btn');
+      if (exportBtn) {
+        exportBtn.addEventListener('click', downloadStrategicBrief);
+      }
+
       // Tab switching
       document.querySelectorAll('.tab-item').forEach(btn => {
         btn.addEventListener('click', () => {
