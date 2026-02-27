@@ -32,14 +32,7 @@ A decision-support cockpit for simulating capital expenditure (CAPEX) impact and
 - **Economic Sensitivity Lab**: Modeling probability-weighted spread adjustments and NPV outcomes.
 - **Strategic Advisory Lab**: Automated expert reporting providing summarized findings on break-even periods and project viability.
 
-![Scenario Lab](assets/scenario_lab.webp)
 
-### 4. Global Facility Map
-High-resolution geographic visualization of facility performance.
-- **Spatial Intelligence**: Leaflet.js-powered map with color-coded risk markers.
-- **Site Selection Telemetry**: Direct injection of site data into the analytical engine from map interactions.
-
-![Facility Map](assets/facility_map.png)
 
 ---
 
