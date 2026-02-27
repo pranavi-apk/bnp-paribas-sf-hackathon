@@ -1543,18 +1543,12 @@
         variance: currentOps - median
       };
 
-      // Pricing logic (Ratchet)
-      // Improvement > 15pts vs baseline (fixed 62.5)
-      const diff = store.results.ops - 62.5;
-      if (diff >= 15) store.results.adjustment = -25;
-      else if (diff <= -10) store.results.adjustment = 20;
-      else store.results.adjustment = 0;
-
-      const effectiveMargin = store.baseMargin + store.results.adjustment;
+      // Pricing logic (Dynamic Institutional Elasticity)
+      const spreadAdj = (store.results.ops - store.elasticity.pivot) * store.elasticity.coeff;
+      store.results.adjustment = -spreadAdj; // Positive performance differential reduces spread
+      
       const loanUSD = store.loan * 1000000;
-      const baseInterest = loanUSD * (store.baseMargin / 10000);
-      const effectiveInterest = loanUSD * (effectiveMargin / 10000);
-      store.results.annualSavings = baseInterest - effectiveInterest;
+      store.results.annualSavings = loanUSD * (spreadAdj / 10000);
 
       // Sensitivity Analysis (±10%)
       const keys = ['api', 'ab', 'reuse', 'compliance'];
