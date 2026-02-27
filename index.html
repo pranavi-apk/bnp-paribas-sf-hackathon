@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlueValue Engine — Expert Intelligence Terminal</title>
+  <meta name="description" content="Professional-grade analytics for Ocean-Linked Financing. ESG risk assessment and margin simulation for global pharmaceutical counterparties." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Leaflet resources -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #0B1F3B;
+      --blue:        #1E3A8A;
+      --teal:        #0F766E;
+      --teal-light:  #CCFBF1;
+      --bg:          #F8FAFC;
+      --card:        #FFFFFF;
+      --border:      #E2E8F0;
+      --border-input:#CBD5E1;
+      --text-primary:#0F172A;
+      --text-secondary:#475569;
+      --text-muted:  #94A3B8;
+      --red:         #DC2626;
+      --amber:       #D97706;
+      --green:       #059669;
+      --green-light: #D1FAE5;
+      --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    html { font-size: 14px; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-feature-settings: "tnum";
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── TOPNAV ────────────────────────────────────────────────────────────── */
+    .topnav {
+      height: 64px;
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo-mark {
+      width: 32px;
+      height: 32px;
+      background: #fff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .nav-subtitle {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      opacity: 0.7;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ─── TAB NAVIGATION ────────────────────────────────────────────────────── */
+    .tab-bar {
+      height: 48px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+
+    .tab-item {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s ease;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    .tab-item:hover {
+      color: var(--navy);
+    }
+
+    .tab-item.active {
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--blue);
+    }
+
+    /* ─── CONTENT WRAPPER ───────────────────────────────────────────────────── */
+    .main-wrapper {
+      flex: 1;
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      overflow-y: auto;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RISK POSITIONING MATRIX (2x2) ───────────────────────────────────── */
+    .matrix-container {
+      position: relative;
+      height: 300px;
+      border: 1px solid var(--border);
+      background: #fff;
+      margin-top: 20px;
+    }
+    .matrix-axis-label {
+      position: absolute;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .matrix-axis-x { bottom: -20px; left: 50%; transform: translateX(-50%); }
+    .matrix-axis-y { left: -45px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+    
+    .matrix-points-layer {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    .matrix-quad {
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      opacity: 0.4;
+    }
+    .matrix-quad.risk-high { background: rgba(220, 38, 38, 0.03); }
+    .matrix-quad.risk-low { background: rgba(5, 150, 105, 0.03); }
+
+    .matrix-spot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--navy);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.4s ease;
+      z-index: 10;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* ─── TECHNICAL TAB COMPONENTS ─────────────────────────────────────────── */
+    .decomp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .decomp-table th { 
+      text-align: left; padding: 12px 8px; border-bottom: 2px solid var(--navy); 
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .decomp-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+    
+    .risk-tag {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .risk-tag.low { background: var(--green-light); color: var(--green); }
+    .risk-tag.mod { background: #FEF3C7; color: #92400E; }
+    .risk-tag.elevated { background: #FEE2E2; color: var(--red); }
+
+    .elasticity-panel {
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    /* ─── COMMON UI COMPONENTS ──────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tri-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+    }
+
+    /* ─── INPUT COMPONENTS ─────────────────────────────────────────────────── */
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .input-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .input-wrap {
+      display: flex;
+      width: 140px;
+      border: 1px solid var(--border-input);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      border: none;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      text-align: right;
+    }
+
+    .input-unit {
+      background: var(--bg);
+      border-left: 1px solid var(--border-input);
+      padding: 6px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 48px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* ─── SLIDER STYLES ────────────────────────────────────────────────────── */
+    .slider-container {
+      margin-bottom: 24px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .slider-info {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .slider-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .slider-unit {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    input[type=range].institutional-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      background: transparent;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      margin: 10px 0;
+    }
+
+    input[type=range].institutional-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: var(--navy);
+      cursor: pointer;
+      border: 3px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-top: -6px; /* Centers thumb on track */
+    }
+
+    input[type=range].institutional-slider::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: var(--navy);
+      cursor: pointer;
+      border: 3px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* ─── OPS DISPLAY ──────────────────────────────────────────────────────── */
+    .ops-hero {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .ops-val {
+      font-size: 72px;
+      font-weight: 700;
+      letter-spacing: -3px;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .ops-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .ops-badge.green { background: var(--green-light); color: var(--green); }
+    .ops-badge.amber { background: #FEF3C7; color: #92400E; }
+    .ops-badge.red   { background: #FEE2E2; color: var(--red); }
+
+    .decile-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    .decile-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+    .decile-val { font-size: 14px; font-weight: 700; color: var(--blue); }
+
+    /* ─── MAP STYLES ───────────────────────────────────────────────────────── */
+    .map-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    .map-container-inner {
+      height: 520px;
+      background: var(--bg);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      z-index: 1;
+    }
+
+    .map-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .leaderboard-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .leaderboard-table tr { border-bottom: 1px solid var(--bg); transition: background 0.2s; }
+    .leaderboard-table tr:hover { background: rgba(0, 0, 0, 0.02); }
+    .leaderboard-table tr.active { background: rgba(15, 118, 110, 0.1); border-left: 3px solid var(--teal); font-weight: 600; }
+    .leaderboard-table td { padding: 10px 4px; }
+    .peer-rank { font-weight: 700; color: var(--navy); width: 30px; text-align: center; }
+    .peer-name { font-size: 11px; color: var(--text-secondary); }
+    .peer-score { font-weight: 700; color: var(--teal); text-align: right; font-variant-numeric: tabular-nums; }
+    
+    .peer-rank { color: var(--text-muted); width: 24px; }
+    .peer-name { color: var(--text-primary); }
+    .peer-score { text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--blue); }
+
+    .benchmark-card {
+      background: var(--navy);
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: auto;
+    }
+    .benchmark-stat { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .benchmark-stat:last-child { margin-bottom: 0; }
+    .benchmark-label { font-size: 9px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+    .benchmark-val { font-size: 13px; font-weight: 600; }
+
+    /* Target specific Leaflet controls */
+    .leaflet-bar { border: 1px solid var(--border) !important; box-shadow: var(--shadow-sm) !important; }
+    .leaflet-bar a { background-color: var(--card) !important; color: var(--text-secondary) !important; border-bottom: 1px solid var(--border) !important; }
+
+    /* ─── TECHNICAL INTELLIGENCE HUB ─────────────────────────────────────── */
+    .forensic-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .forensic-table th {
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--border);
+      letter-spacing: 0.5px;
+    }
+    .forensic-table td {
+      padding: 16px;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .forensic-table tr:hover { background: rgba(30, 58, 138, 0.02); }
+    
+    .benchmark-tag {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+    .benchmark-tag.median { background: var(--bg); color: var(--text-muted); }
+    .benchmark-tag.quartile { background: rgba(15, 118, 110, 0.1); color: var(--teal); }
+    
+    .abatement-matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .abatement-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      border-left: 3px solid var(--blue);
+    }
+    .abatement-label { font-size: 11px; font-weight: 600; }
+    .abatement-benefit { font-size: 11px; font-weight: 700; color: var(--green); }
+
+    .quadrant-hub {
+      position: relative;
+      height: 380px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    .quadrant-zone {
+      padding: 24px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .quadrant-zone:nth-child(1) { border-right: 1px dashed var(--border); border-bottom: 1px dashed var(--border); background: rgba(239, 68, 68, 0.02); }
+    .quadrant-zone:nth-child(2) { border-bottom: 1px dashed var(--border); background: rgba(245, 158, 11, 0.02); }
+    .quadrant-zone:nth-child(3) { border-right: 1px dashed var(--border); background: rgba(16, 185, 129, 0.02); }
+    .quadrant-zone:nth-child(4) { background: rgba(59, 130, 246, 0.02); }
+
+    .quadrant-title {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .quadrant-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    
+    .quadrant-marker {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--navy);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(11, 31, 59, 0.4);
+      z-index: 10;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .quadrant-marker::after {
+      content: 'Current Position';
+      position: absolute;
+      white-space: nowrap;
+      left: 20px;
+      top: -2px;
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--navy);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    /* ─── SCENARIO LAB STYLES ─────────────────────────────────────────────── */
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .scenario-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      position: relative;
+    }
+    .scenario-card:hover { border-color: var(--blue); background: #fff; }
+    .scenario-card.active { 
+      border-color: var(--blue); 
+      background: var(--navy); 
+      color: #fff; 
+      box-shadow: 0 4px 12px rgba(11, 31, 59, 0.2);
+    }
+    .scenario-card.active .scenario-icon { color: #fff; }
+    .scenario-card .scenario-icon { font-size: 18px; margin-bottom: 6px; color: var(--blue); display: block; }
+    .scenario-card .scenario-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ─── SCENARIO INTELLIGENCE COCKPIT ───────────────────────────────────── */
+    .cockpit-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .sensitivity-lab {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .knob-container {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .visual-bridge {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bridge-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .bridge-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .bridge-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      position: relative;
+    }
+
+    .bridge-comparison::before {
+      content: 'VS';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-muted);
+      background: var(--bg);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      z-index: 2;
+    }
+
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .telemetry-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .telemetry-val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -1px;
+    }
+
+    .telemetry-diff {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--blue);
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .advisor-panel {
+      background: var(--navy);
+      color: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .advisor-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .advisor-memo {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      font-style: italic;
+    }
+
+    .advisor-metric {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .advisor-metric-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--teal-light);
+    }
+
+    /* ─── UTILITIES ────────────────────────────────────────────────────────── */
+    .btn-action {
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .chart-container { position: relative; height: 100%; width: 100%; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .data-table th { text-align: left; color: var(--text-secondary); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 8px; border-bottom: 1px solid var(--border); }
+
+    .footer { padding: 24px; text-align: center; font-size: 10px; color: var(--text-muted); opacity: 0.7; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ TOP NAVIGATION ════════════════════════════════════════════════════ -->
+  <nav class="topnav">
+    <div class="nav-brand">
+      <div class="nav-logo-mark">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 14c2-2 4-2 6 0s4 2 6 0" stroke="var(--navy)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 10c2-2 4-2 6 0s4 2 6 0" stroke="var(--navy)" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="nav-title">BlueValue Intelligence</span>
+      <div class="nav-divider"></div>
+      <span class="nav-subtitle">ESG Risk Terminal</span>
+    </div>
+    <div class="nav-right">
+      <div style="font-size: 11px; color: rgba(255,255,255,0.6);">Market Status: <span style="color:#4ADE80;">CLOSED</span></div>
+      <div class="nav-divider"></div>
+      <button style="background:none; border:none; color:inherit; cursor:pointer;"><svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm0-5a1 1 0 0 1-1-1V9a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1Z"/></svg></button>
+    </div>
+  </nav>
+
+  <!-- ═══ TAB BAR ═══════════════════════════════════════════════════════════ -->
+  <div class="tab-bar">
+    <button class="tab-item active" data-tab="overview">OVERVIEW</button>
+    <button class="tab-item" data-tab="technical">TECHNICAL HUB</button>
+    <button class="tab-item" data-tab="simulator">SCENARIO SIMULATOR</button>
+    <button class="tab-item" data-tab="map">GLOBAL FACILITY MAP</button>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ══════════════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- ─── TAB: OVERVIEW ──────────────────────────────────────────────────── -->
+    <div id="overview" class="tab-panel active">
+      <div class="tri-grid">
+        
+        <!-- Pillar 1: ESG Inputs (with sliders) -->
+        <div class="card">
+          <div class="card-title">Site-Level KPI Controls</div>
+          
+          <div class="slider-container">
+            <div class="slider-header">
+              <span class="input-label">API Discharge Load</span>
+              <div class="slider-info">
+                <span class="slider-val" id="api_val_display">15.0</span>
+                <span class="slider-unit">mg/U</span>
+              </div>
+            </div>
+            <input type="range" id="api_val" min="0" max="50" step="0.1" value="15" class="institutional-slider">
+          </div>
+
+          <div class="slider-container">
+            <div class="slider-header">
+              <span class="input-label">Antibiotic Residue</span>
+              <div class="slider-info">
+                <span class="slider-val" id="ab_val_display">8.0</span>
+                <span class="slider-unit">mg/L</span>
+              </div>
+            </div>
+            <input type="range" id="ab_val" min="0" max="50" step="0.1" value="8" class="institutional-slider">
+          </div>
+
+          <div class="slider-container">
+            <div class="slider-header">
+              <span class="input-label">Water Reuse Rate</span>
+              <div class="slider-info">
+                <span class="slider-val" id="reuse_val_display">45</span>
+                <span class="slider-unit">%</span>
+              </div>
+            </div>
+            <input type="range" id="reuse_val" min="0" max="100" step="1" value="45" class="institutional-slider">
+          </div>
+
+          <div class="slider-container">
+            <div class="slider-header">
+              <span class="input-label">Compliance Score</span>
+              <div class="slider-info">
+                <span class="slider-val" id="comp_val_display">70</span>
+                <span class="slider-unit">pts</span>
+              </div>
+            </div>
+            <input type="range" id="comp_val" min="0" max="100" step="1" value="70" class="institutional-slider">
+          </div>
+
+          <div class="divider"></div>
+          
+          <div class="input-row">
+            <span class="input-label">Loan Notional (USDm)</span>
+            <div class="input-wrap"><input type="number" id="loan_val" value="500" step="10"><span class="input-unit">USDm</span></div>
+          </div>
+        </div>
+
+        <!-- Pillar 2: OPS Score -->
+        <div class="card">
+          <div class="card-title">Real-Time OPS Score</div>
+          <div class="ops-hero">
+            <div class="ops-val" id="ops_display">74.2</div>
+            <div class="ops-badge green" id="status_badge">
+              <span>●</span> <span id="status_text">Preferred Status</span>
+            </div>
+            <div class="decile-indicator" id="decile_indicator">
+              <span class="decile-label">BNP Portfolio Ranking</span>
+              <span class="decile-val" id="portfolio_decile">DECILE 4 (TOP 40%)</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="height: 180px;">
+            <canvas id="overviewRadar"></canvas>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Financials -->
+        <div class="card">
+          <div class="card-title">Pricing & Benefit Summary</div>
+          <table class="data-table">
+            <tr><td>Base Margin</td><td style="text-align:right; font-weight:600;" id="base_margin_txt">250 bps</td></tr>
+            <tr><td>SLL Adjustment</td><td style="text-align:right; font-weight:600; color:var(--green);" id="adj_margin_txt">-25 bps</td></tr>
+            <tr><td>Effective Margin</td><td style="text-align:right; font-weight:700;" id="eff_margin_txt">225 bps</td></tr>
+            <tr><td colspan="2" style="padding-top:16px; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Est. Annual Benefit</td></tr>
+            <tr><td colspan="2" style="font-size:24px; font-weight:700; color:var(--teal);" id="annual_sav_txt">$1.25M</td></tr>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recent Historical Trend</div>
+        <div style="height: 240px;">
+          <canvas id="overviewTrend"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: TECHNICAL INTELLIGENCE HUB ─────────────────────────────────── -->
+    <div id="technical" class="tab-panel">
+      <!-- 1️⃣ Forensic KPI Decomposition -->
+      <div class="card">
+        <div class="card-title">FORENSIC KPI DECOMPOSITION (Audit View vs. Benchmarks)</div>
+        <table class="forensic-table">
+          <thead>
+            <tr>
+              <th>KPI Attribute</th>
+              <th>Raw Value</th>
+              <th>Portfolio Median</th>
+              <th>Peer Delta</th>
+              <th>Normalized</th>
+              <th>Weight</th>
+              <th>Contribution</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody id="decomp_body">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tri-grid">
+        <!-- 2️⃣ OPS Sensitivity & Marginal Abatement -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-title">MARGINAL ABATEMENT & SENSITIVITY ANALYSIS</div>
+          <div style="display:grid; grid-template-columns: 1fr 280px; gap:24px;">
+            <div style="height: 240px;">
+              <canvas id="tornadoChart"></canvas>
+            </div>
+            <div class="abatement-matrix">
+              <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Next-Best Action ROI</div>
+              <div class="abatement-row">
+                <div class="abatement-label">10% API Reduction</div>
+                <div class="abatement-benefit">+1.8 pts</div>
+              </div>
+              <div class="abatement-row">
+                <div class="abatement-label">20% Water Recovery</div>
+                <div class="abatement-benefit">+0.9 pts</div>
+              </div>
+              <div class="abatement-row" style="border-color:var(--teal);">
+                <div class="abatement-label">Compliance Buffering</div>
+                <div class="abatement-benefit">+3.2 pts</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px; font-size:11px; color:var(--text-muted); line-height:1.4;">
+            Analysis models the marginal increase in Overall Performance Score (OPS) per unit of operational optimization. 
+            Prioritization should target high-beta drivers to maximize margin ratchet elasticity.
+          </div>
+        </div>
+
+        <!-- 3️⃣ OPS-to-Spread Efficiency -->
+        <div class="card">
+          <div class="card-title">Credit Efficiency Model</div>
+          <div class="elasticity-panel">
+            <div style="margin-bottom:12px;">
+              <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Current Performance</div>
+              <div style="font-size:24px; font-weight:700; color:var(--navy);">OPS <span id="elasticity_ops">74.2</span></div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Risk Status</div>
+              <div class="risk-tag low" id="elasticity_risk" style="display:inline-block; font-size:11px; padding:4px 10px;">PREFERRED</div>
+            </div>
+            <div class="divider"></div>
+            <div style="margin-bottom:16px;">
+              <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Implied Spread Adj.</div>
+              <div style="font-size:20px; font-weight:700; color:var(--teal);" id="elasticity_spread">-15 bps</div>
+            </div>
+            
+            <details>
+              <summary style="font-size:10px; color:var(--blue); cursor:pointer; font-weight:600;">Analytical Parameters</summary>
+              <div style="padding-top:10px;">
+                <div class="input-row">
+                  <span style="font-size:10px;">Coeff (bp/pt)</span>
+                  <div class="input-wrap" style="width:70px;"><input type="number" id="elasticity_coeff" value="1.0" step="0.1"></div>
+                </div>
+                <div class="input-row">
+                  <span style="font-size:10px;">Pivot</span>
+                  <div class="input-wrap" style="width:70px;"><input type="number" id="pivot_score" value="60" step="1"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- 4️⃣ Strategic Risk Quadrant Hub -->
+        <div class="card" style="grid-column: span 1;">
+          <div class="card-title">Portfolio Risk Quadrant Hub</div>
+          <div class="quadrant-hub">
+            <div class="quadrant-zone">
+              <div class="quadrant-title" style="color:var(--red);">I. Critical</div>
+              <div class="quadrant-desc">High exposure. Intervention required.</div>
+            </div>
+            <div class="quadrant-zone">
+              <div class="quadrant-title" style="color:var(--orange);">II. Volatile</div>
+              <div class="quadrant-desc">Technical debt detected.</div>
+            </div>
+            <div class="quadrant-zone">
+              <div class="quadrant-title" style="color:var(--green);">III. Elite</div>
+              <div class="quadrant-desc">Institutional benchmark leader.</div>
+            </div>
+            <div class="quadrant-zone">
+              <div class="quadrant-title" style="color:var(--blue);">IV. Resilient</div>
+              <div class="quadrant-desc">Steady compliance trajectory.</div>
+            </div>
+            <div class="quadrant-marker" id="risk_matrix_spot"></div>
+          </div>
+          <div style="margin-top:20px; font-size:10px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">
+            Relative Positioning Axis: Score vs. Regulatory Exposure
+          </div>
+        </div>
+
+        <!-- 5️⃣ Optimization Roadmap -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-title">5-YEAR OPTIMIZATION ROADMAP (Projected OPS)</div>
+          <div style="height: 280px;">
+            <canvas id="projectionChart"></canvas>
+          </div>
+          <div style="margin-top:16px; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div class="knob-container" style="padding:12px;">
+               <span class="input-label" style="font-size:10px;">Target API Abatement (%)</span>
+               <input type="range" id="proj_api_rate" min="0" max="15" step="0.5" value="5" class="institutional-slider">
+            </div>
+            <div class="knob-container" style="padding:12px;">
+               <span class="input-label" style="font-size:10px;">Target Water Circularity (%)</span>
+               <input type="range" id="proj_water_rate" min="0" max="15" step="0.5" value="3" class="institutional-slider">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ─── TAB: SIMULATOR ─────────────────────────────────────────────────── -->
+    <div id="simulator" class="tab-panel">
+      <!-- 1️⃣ Scenario Selection Cards -->
+      <div class="card" style="margin-bottom: 24px; padding: 12px 20px;">
+        <div class="card-title" style="margin-bottom: 12px;">Strategic Selection Engine</div>
+        <div class="scenario-grid">
+          <div class="scenario-card active" data-scenario="baseline">
+            <span class="scenario-icon">📊</span>
+            <span class="scenario-name">Baseline</span>
+          </div>
+          <div class="scenario-card" data-scenario="treatment">
+            <span class="scenario-icon">🛡️</span>
+            <span class="scenario-name">Upgrade</span>
+          </div>
+          <div class="scenario-card" data-scenario="regulatory">
+            <span class="scenario-icon">📜</span>
+            <span class="scenario-name">Regulatory</span>
+          </div>
+          <div class="scenario-card" data-scenario="circular">
+            <span class="scenario-icon">🔄</span>
+            <span class="scenario-name">Circular</span>
+          </div>
+          <div class="scenario-card" data-scenario="water">
+            <span class="scenario-icon">💧</span>
+            <span class="scenario-name">Scarcity</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cockpit-layout">
+        <!-- 2️⃣ Financial Sensitivity Lab -->
+        <div class="sensitivity-lab">
+          <div class="card" style="margin-bottom:0; flex:1; display:flex; flex-direction:column;">
+            <div class="card-title">Economic Lab</div>
+            
+            <div class="knob-container">
+              <div class="slider-header">
+                <span class="input-label" style="font-size:11px;">Enforcement Probability</span>
+                <span class="slider-val" id="cockpit_prob_display">35%</span>
+              </div>
+              <input type="range" id="prob_val" min="0" max="100" value="35" class="institutional-slider">
+            </div>
+
+            <div class="knob-container">
+              <div class="slider-header">
+                <span class="input-label" style="font-size:11px;">Project CAPEX</span>
+                <span class="slider-val" id="cockpit_capex_display">$1.5M</span>
+              </div>
+              <input type="range" id="sim_capex" min="0.1" max="15" step="0.1" value="1.5" class="institutional-slider">
+            </div>
+
+            <div class="knob-container">
+              <div class="slider-header">
+                <span class="input-label" style="font-size:11px;">WACC / Discount Rate</span>
+                <span class="slider-val" id="cockpit_discount_display">8.5%</span>
+              </div>
+              <input type="range" id="sim_discount" min="1" max="15" step="0.1" value="8.5" class="institutional-slider">
+            </div>
+
+            <div style="margin-top:auto; padding-top:20px;">
+              <div class="telemetry-label">Expected Spread Penalty</div>
+              <div class="telemetry-val" id="expected_spread" style="color:var(--red); font-size:24px;">+8 bps</div>
+              <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">Probability-weighted risk premium.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3️⃣ Visual Comparison Bridge -->
+        <div class="visual-bridge">
+          <div class="bridge-card">
+            <div class="bridge-header">
+              <div class="telemetry-label">Ocean Performance Score (OPS)</div>
+              <div class="risk-tag low" id="bridge_ops_status">Strategic</div>
+            </div>
+            <div class="bridge-comparison">
+              <div class="telemetry-item">
+                <div class="telemetry-label">Baseline</div>
+                <div class="telemetry-val">68.5</div>
+                <div class="progress-track"><div class="progress-fill" style="width: 68.5%; opacity:0.4;"></div></div>
+              </div>
+              <div class="telemetry-item" style="text-align: right;">
+                <div class="telemetry-label">Simulated</div>
+                <div class="telemetry-val" id="bridge_ops_val">74.2</div>
+                <div class="progress-track"><div class="progress-fill" id="bridge_ops_progress" style="width: 74.2%;"></div></div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top:16px;">
+              <span id="bridge_ops_diff" class="telemetry-diff" style="color:var(--green);">+5.7 pts improvement</span>
+            </div>
+          </div>
+
+          <div class="bridge-card">
+            <div class="bridge-header">
+              <div class="telemetry-label">Interest Expense Impact</div>
+              <div class="risk-tag mod">Simulated</div>
+            </div>
+            <div class="bridge-comparison">
+              <div class="telemetry-item">
+                <div class="telemetry-label">Baseline</div>
+                <div class="telemetry-val">$12.5M</div>
+              </div>
+              <div class="telemetry-item" style="text-align: right;">
+                <div class="telemetry-label">Simulated</div>
+                <div class="telemetry-val" id="bridge_interest_val">$12.2M</div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top:16px;">
+              <span id="bridge_interest_diff" class="telemetry-diff" style="color:var(--green);">-$0.3M Annual Savings</span>
+            </div>
+          </div>
+
+          <!-- Impact Trajectory -->
+          <div class="card" style="margin-bottom:0; flex:1;">
+            <div class="card-title">Scenario Impact Trajectory</div>
+            <div style="height: 140px;">
+              <canvas id="impactTrajectoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4️⃣ Strategic Advisor -->
+        <div class="advisor-panel">
+          <div class="advisor-title">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm1 15h-2v-6h2v6Zm0-8h-2V7h2v2Z"/></svg>
+            Strategic Advisory Lab
+          </div>
+          
+          <div class="advisor-memo" id="strat_recommendation" style="font-size:12px; line-height:1.5;">
+            Analyzing scenarios...
+          </div>
+
+          <div class="divider" style="background:rgba(255,255,255,0.1);"></div>
+
+          <div class="advisor-metric">
+            <div class="telemetry-label" style="color:rgba(255,255,255,0.5);">5-Year Plan NPV</div>
+            <div class="advisor-metric-val" id="npv_display">$4.2M</div>
+            <div id="npv_status" class="risk-tag low" style="margin-top:8px; display:inline-block;">Viable</div>
+          </div>
+
+          <div class="advisor-metric">
+            <div class="telemetry-label" style="color:rgba(255,255,255,0.5);">Months to Payback</div>
+            <div class="advisor-metric-val" id="breakeven_display">14 Months</div>
+          </div>
+
+          <div style="margin-top:auto;">
+            <button class="btn-action" style="width:100%; background:var(--teal); color:#fff; border:none; font-size:11px;">EXPORT STRATEGIC BRIEF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: MAP ───────────────────────────────────────────────────────── -->
+    <div id="map" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          Global Pharma Manufacturing Footprint 
+          <span id="active_site_name" style="color:var(--blue); font-weight:700;">— SELECT FACILITY</span>
+        </div>
+        <div class="map-layout">
+          <div id="worldMap" class="map-container-inner"></div>
+          
+          <div class="map-sidebar">
+            <div class="card" style="margin-bottom:0; flex:1;">
+              <div class="leaderboard-title">
+                <span>BNP PORTFOLIO LEADERBOARD</span>
+                <span style="color:var(--text-muted); font-weight:400;">Ocean Performance Score</span>
+              </div>
+              <table class="leaderboard-table">
+                <tbody id="leaderboard_body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="benchmark-card">
+              <div class="benchmark-stat">
+                <span class="benchmark-label">Portfolio Median OPS</span>
+                <span class="benchmark-val" id="portfolio_median">68.2</span>
+              </div>
+              <div class="benchmark-stat">
+                <span class="benchmark-label">Top Quartile Threshold</span>
+                <span class="benchmark-val">82.5</span>
+              </div>
+              <div class="benchmark-stat">
+                <span class="benchmark-label">Selected vs Portfolio</span>
+                <span class="benchmark-val" id="portfolio_variance">+12.0 pts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size:11px; color:var(--text-muted);">
+            Connected Pharmaceutical Ecosystem. Anonymized peer telemetry provided for institutional benchmarking.
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:var(--teal);"></span>
+              <span style="font-size:10px; color:var(--text-secondary);">Preferred</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:var(--red);"></span>
+              <span style="font-size:10px; color:var(--text-secondary);">Risk/Remediation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    INTERNAL USE ONLY — BNP Paribas Global Markets · Sustainable Finance Engineering · © 2026
+  </footer>
+
+  <!-- ═══ JAVASCRIPT ════════════════════════════════════════════════════════ -->
+  <script>
+    // ─── STATE MANAGEMENT ────────────────────────────────────────────────────
+    const store = {
+      api: 15.0,
+      ab: 8.0,
+      reuse: 45,
+      compliance: 70,
+      loan: 500, // USDm
+      baseMargin: 250,
+      weights: { api: 0.35, ab: 0.25, reuse: 0.20, comp: 0.20 },
+      thresholds: { api: 15, ab: 10, reuse: 40, comp: 75 }, // Monitoring/Reg thresholds
+      elasticity: { coeff: 1.0, pivot: 60 },
+      projection: { apiRate: 5.0, waterRate: 3.0 },
+      scenario: 'baseline',
+      simParams: { prob: 35, capex: 12.5, discount: 8.0 },
+      results: {
+        norm: { api:0, ab:0, reuse:0, comp:0 },
+        ops: 0,
+        adjustment: 0,
+        annualSavings: 0,
+        sensitivity: [] // For tornado
+      }
+    };
+
+    // ─── CHARTS ──────────────────────────────────────────────────────────────
+    let radarChart, trendChart, tornadoChart, projectionChart, impactTrajectoryChart, map;
+
+    const FACILITIES = [
+        { name: "New Jersey R&D", coords: [40.7128, -74.0060], values: { api: 8.2, ab: 4.1, reuse: 65, comp: 95 }, isPeer: false },
+        { name: "Frankfurt Analytics", coords: [50.1109, 8.6821], values: { api: 12.5, ab: 9.8, reuse: 32, comp: 98 }, isPeer: false },
+        { name: "Hyderabad Bulk Site", coords: [17.3850, 78.4867], values: { api: 34.2, ab: 22.4, reuse: 22, comp: 62 }, isPeer: false },
+        { name: "Shanghai Bio-Tech", coords: [31.2304, 121.4737], values: { api: 18.5, ab: 11.2, reuse: 54, comp: 88 }, isPeer: false },
+        { name: "São Paulo Logistics", coords: [-23.5505, -46.6333], values: { api: 5.2, ab: 2.1, reuse: 78, comp: 92 }, isPeer: false },
+        // Peer Network (Anonymized)
+        { name: "Pharma Peer Alpha", coords: [45.0, -100.0], values: { api: 10.0, ab: 4.0, reuse: 70, comp: 85 }, isPeer: true },
+        { name: "Pharma Peer Beta", coords: [52.0, 15.0], values: { api: 14.0, ab: 6.0, reuse: 50, comp: 82 }, isPeer: true },
+        { name: "Pharma Peer Gamma", coords: [25.0, 110.0], values: { api: 18.0, ab: 9.0, reuse: 40, comp: 75 }, isPeer: true },
+        { name: "Pharma Peer Delta", coords: [1.3521, 103.8198], values: { api: 12.0, ab: 5.0, reuse: 60, comp: 90 }, isPeer: true }
+    ];
+
+    function initMap() {
+      // Initialize map on the 'worldMap' div
+      map = L.map('worldMap', {
+        center: [20, 0],
+        zoom: 2,
+        minZoom: 2,
+        maxBounds: [[-90, -180], [90, 180]]
+      });
+
+      // Professional muted tile layer (CartoDB Positron)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+      }).addTo(map);
+
+      // Add facility markers
+      FACILITIES.forEach(site => {
+        const color = site.isPeer ? '#94A3B8' : (site.values.api < 15 ? '#0F766E' : '#DC2626');
+        const radius = site.isPeer ? 6 : 9;
+
+        site.marker = L.circleMarker(site.coords, {
+          radius: radius,
+          fillColor: color,
+          color: "#fff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: site.isPeer ? 0.6 : 0.9
+        }).addTo(map);
+
+        const popupHtml = `
+          <div style="font-family:'Inter',sans-serif; min-width:160px;">
+            <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${site.isPeer ? 'ANONYMIZED PEER' : 'PORTFOLIO FACILITY'}</div>
+            <div style="font-weight:700; font-size:12px; margin-bottom:8px; color:var(--navy);">${site.name}</div>
+            <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:10px;"><span>API Load</span><span style="font-weight:600;">${site.values.api} mg/U</span></div>
+              <div style="display:flex; justify-content:space-between; font-size:10px;"><span>Water Reuse</span><span style="font-weight:600;">${site.values.reuse}%</span></div>
+            </div>
+            ${site.isPeer ? '<div style="font-size:9px; font-style:italic; color:var(--text-muted);">Institutional benchmark data only.</div>' : `<button onclick="loadSiteData('${site.name}')" style="width:100%; font-size:10px; padding:6px; cursor:pointer; background:var(--blue); color:#fff; border:none; border-radius:4px; font-weight:600;">Analyze Facility</button>`}
+          </div>
+        `;
+        site.marker.bindPopup(popupHtml);
+      });
+    }
+
+    function loadSiteData(siteName) {
+      const site = FACILITIES.find(f => f.name === siteName);
+      if (!site) return;
+
+      document.getElementById('active_site_name').textContent = site.name;
+      
+      store.api = site.values.api;
+      store.ab = site.values.ab;
+      store.reuse = site.values.reuse;
+      store.compliance = site.values.comp;
+
+      // Update UI Inputs
+      document.getElementById('api_val').value = store.api;
+      document.getElementById('ab_val').value = store.ab;
+      document.getElementById('reuse_val').value = store.reuse;
+      document.getElementById('comp_val').value = store.compliance;
+
+      calculate();
+    }
+
+    function initCharts() {
+      // OVERVIEW RADAR
+      radarChart = new Chart(document.getElementById('overviewRadar'), {
+        type: 'radar',
+        data: {
+          labels: ['API', 'Antibiotic', 'Reuse', 'Compliance'],
+          datasets: [{
+            data: [0, 0, 0, 0],
+            backgroundColor: 'rgba(15, 118, 110, 0.1)',
+            borderColor: 'rgba(15, 118, 110, 0.8)',
+            borderWidth: 2,
+            pointRadius: 2
+          }]
+        },
+        options: {
+          scales: { r: { min: 0, max: 100, ticks: { display: false } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // OVERVIEW TREND
+      trendChart = new Chart(document.getElementById('overviewTrend'), {
+        type: 'line',
+        data: {
+          labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Current'],
+          datasets: [{
+            label: 'OPS Score',
+            data: [70.2, 71.5, 69.8, 72.1, 73.5, 74.2],
+            borderColor: '#1E3A8A',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: false
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { min: 60, max: 80 } }
+        }
+      });
+
+      // PROJECTION (TECHNICAL HUB)
+      projectionChart = new Chart(document.getElementById('projectionChart'), {
+        type: 'line',
+        data: {
+          labels: ['Current', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5'],
+          datasets: [{
+            label: 'Projected OPS',
+            data: [0,0,0,0,0,0],
+            borderColor: '#0F766E',
+            backgroundColor: 'rgba(15, 118, 110, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { min: 40, max: 100, grid: { color: '#E2E8F0' } } }
+        }
+      });
+
+      // TORNADO (MARGINAL BENEFIT ANALYSIS)
+      tornadoChart = new Chart(document.getElementById('tornadoChart'), {
+        type: 'bar',
+        data: {
+          labels: ['API Redux', 'AB Abatement', 'Water Reuse', 'Compliance'],
+          datasets: [
+            { label: 'Marginal OPS Benefit (+10% Opt)', data: [0,0,0,0], backgroundColor: 'rgba(15, 118, 110, 0.8)' }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { 
+              grid: { color: '#f1f5f9' },
+              ticks: { font: { size: 9 }, color: '#64748b' },
+              title: { display: true, text: 'OPS Score Increase', font: { size: 9, weight: 'bold' } }
+            },
+            y: { grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, color: '#1e293b' } }
+          }
+        }
+      });
+
+      impactTrajectoryChart = new Chart(document.getElementById('impactTrajectoryChart'), {
+        type: 'line',
+        data: {
+          labels: ['Current', 'Y1', 'Y2', 'Y3', 'Y4', 'Y5'],
+          datasets: [
+            { label: 'Baseline', data: [68.5, 68.5, 68.5, 68.5, 68.5, 68.5], borderColor: '#94A3B8', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, fill: false },
+            { label: 'Scenario', data: [68.5, 70, 72, 74, 76, 78], borderColor: '#0F766E', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.4 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { display: false, min: 40, max: 100 },
+            x: { grid: { display: false }, ticks: { font: { size: 8 } } }
+          }
+        }
+      });
+    }
+
+    // ─── CALCULATION ENGINE ──────────────────────────────────────────────────
+    function calculate() {
+      // Normalization
+      store.results.norm.api = Math.max(0, 100 - (store.api / 50 * 100));
+      store.results.norm.ab = Math.max(0, 100 - (store.ab / 50 * 100));
+      store.results.norm.reuse = Math.min(100, store.reuse);
+      store.results.norm.comp = Math.min(100, store.compliance);
+
+      // OPS
+      const ops = (store.results.norm.api * store.weights.api) +
+                  (store.results.norm.ab * store.weights.ab) +
+                  (store.results.norm.reuse * store.weights.comp) +
+                  (store.results.norm.comp * store.weights.comp);
+      
+      store.results.ops = Math.round(ops * 10) / 10;
+
+      // Peer Benchmarking Logic (Dynamic)
+      const currentOps = store.results.ops;
+      
+      // Calculate scores for all facilities to build accurate leaderboard
+      FACILITIES.forEach(f => {
+        const nApi = Math.max(0, 100 - (f.values.api / 50 * 100));
+        const nAb = Math.max(0, 100 - (f.values.ab / 50 * 100));
+        const nReuse = Math.min(100, f.values.reuse);
+        const nComp = Math.min(100, f.values.comp);
+        f.calculatedOps = (nApi * store.weights.api) + (nAb * store.weights.ab) + (nReuse * store.weights.comp) + (nComp * store.weights.comp);
+      });
+
+      const allOps = FACILITIES.map(f => f.calculatedOps).sort((a, b) => b - a);
+      const median = allOps[Math.floor(allOps.length / 2)];
+      const rank = allOps.filter(v => v > currentOps).length + 1;
+      const decile = Math.ceil((rank / allOps.length) * 10);
+      
+      store.results.portfolio = {
+        rank: rank,
+        decile: decile,
+        total: allOps.length,
+        median: median,
+        variance: currentOps - median
+      };
+
+      // Pricing logic (Ratchet)
+      // Improvement > 15pts vs baseline (fixed 62.5)
+      const diff = store.results.ops - 62.5;
+      if (diff >= 15) store.results.adjustment = -25;
+      else if (diff <= -10) store.results.adjustment = 20;
+      else store.results.adjustment = 0;
+
+      const effectiveMargin = store.baseMargin + store.results.adjustment;
+      const loanUSD = store.loan * 1000000;
+      const baseInterest = loanUSD * (store.baseMargin / 10000);
+      const effectiveInterest = loanUSD * (effectiveMargin / 10000);
+      store.results.annualSavings = baseInterest - effectiveInterest;
+
+      // Sensitivity Analysis (±10%)
+      const keys = ['api', 'ab', 'reuse', 'compliance'];
+      const sensPositive = [];
+      const sensNegative = [];
+      
+      keys.forEach(key => {
+        // Mocking sensitivity logic: how much OPS changes if this shifts 10%
+        const baseVal = store[key];
+        const step = baseVal * 0.1;
+        
+        // For API/AB, increase is bad (reduces OPS)
+        const direction = (key === 'api' || key === 'ab') ? -1 : 1;
+        const impact = (step * direction) * store.weights[key] * (key==='api'||key==='ab' ? 2 : 1); // API/AB have sharper gradients in normalization
+        
+        sensPositive.push(impact);
+        sensNegative.push(-impact);
+      });
+      store.results.sensitivity = { pos: sensPositive, neg: sensNegative };
+
+      updateUI();
+    }
+
+    function updateUI() {
+      const ops = store.results.ops;
+      document.getElementById('ops_display').textContent = ops;
+      document.getElementById('elasticity_ops').textContent = ops;
+      
+      const badge = document.getElementById('status_badge');
+      const text = document.getElementById('status_text');
+      const elasticityRisk = document.getElementById('elasticity_risk');
+      
+      let riskLabel = 'LOW';
+      if (ops >= 70) {
+        badge.className = 'ops-badge green'; text.textContent = 'Preferred Status';
+        elasticityRisk.className = 'risk-tag low'; elasticityRisk.textContent = 'PREFERRED';
+      } else if (ops >= 40) {
+        badge.className = 'ops-badge amber'; text.textContent = 'Moderate Performance';
+        elasticityRisk.className = 'risk-tag mod'; elasticityRisk.textContent = 'MODERATE';
+        riskLabel = 'MOD';
+      } else {
+        badge.className = 'ops-badge red'; text.textContent = 'High ESG Risk';
+        elasticityRisk.className = 'risk-tag elevated'; elasticityRisk.textContent = 'ELEVATED';
+        riskLabel = 'ELEVATED';
+      }
+
+      // Elasticity Spread Adjustment
+      const spreadAdjustment = (ops - store.elasticity.pivot) * store.elasticity.coeff;
+      const spreadSign = spreadAdjustment >= 0 ? '-' : '+';
+      document.getElementById('elasticity_spread').textContent = spreadSign + Math.abs(Math.round(spreadAdjustment)) + ' bps';
+      document.getElementById('elasticity_spread').style.color = spreadAdjustment >= 0 ? 'var(--green)' : 'var(--red)';
+
+      document.getElementById('annual_sav_txt').textContent = '$' + (store.results.annualSavings / 1000000).toFixed(2) + 'M';
+      
+      // Portfolio Intelligence Updates
+      const port = store.results.portfolio;
+      const decileEl = document.getElementById('portfolio_decile');
+      decileEl.textContent = `DECILE ${port.decile} (TOP ${port.decile * 10}%)`;
+      
+      const varianceSign = port.variance >= 0 ? '+' : '';
+      document.getElementById('portfolio_variance').textContent = `${varianceSign}${port.variance.toFixed(1)} pts`;
+      document.getElementById('portfolio_variance').style.color = port.variance >= 0 ? 'var(--green)' : 'var(--red)';
+
+      // Populate Leaderboard (Dynamic from FACILITIES)
+      const activeName = document.getElementById('active_site_name').textContent;
+      const leaderboardData = FACILITIES.map(f => ({
+        name: f.name,
+        ops: f.calculatedOps,
+        active: f.name === activeName,
+        isPeer: f.isPeer
+      })).sort((a, b) => b.ops - a.ops);
+
+      let lbHtml = '';
+      leaderboardData.slice(0, 8).forEach((p, i) => { // Show top 8
+        lbHtml += `
+          <tr class="${p.active ? 'active' : ''}" style="cursor:pointer;" onclick="focusFacility('${p.name}')">
+            <td class="peer-rank">#${i+1}</td>
+            <td class="peer-name">${p.name}</td>
+            <td class="peer-score">${p.ops.toFixed(1)}</td>
+          </tr>
+        `;
+      });
+      document.getElementById('leaderboard_body').innerHTML = lbHtml;
+      document.getElementById('portfolio_median').textContent = port.median.toFixed(1);
+
+      // Slider Displays
+      document.getElementById('api_val_display').textContent = store.api.toFixed(1);
+      document.getElementById('ab_val_display').textContent = store.ab.toFixed(1);
+      document.getElementById('reuse_val_display').textContent = Math.round(store.reuse);
+      document.getElementById('comp_val_display').textContent = Math.round(store.compliance);
+
+      // ─── KPI FORENSIC DECOMPOSITION ───
+      // Calculate Peer Medians per KPI
+      const kpiMetrics = {
+        api: FACILITIES.map(f => f.values.api).sort((a,b) => a-b),
+        ab: FACILITIES.map(f => f.values.ab).sort((a,b) => a-b),
+        reuse: FACILITIES.map(f => f.values.reuse).sort((a,b) => a-b),
+        comp: FACILITIES.map(f => f.values.comp).sort((a,b) => a-b)
+      };
+      
+      const getMedian = (arr) => arr[Math.floor(arr.length/2)];
+      const medians = {
+        api: getMedian(kpiMetrics.api),
+        ab: getMedian(kpiMetrics.ab),
+        reuse: getMedian(kpiMetrics.reuse),
+        comp: getMedian(kpiMetrics.comp)
+      };
+
+      const kpis = [
+        { name: 'API Discharge Load', val: store.api, med: medians.api, norm: store.results.norm.api, weight: store.weights.api, unit: 'mg/U', inv: true },
+        { name: 'Antibiotic Residue', val: store.ab, med: medians.ab, norm: store.results.norm.ab, weight: store.weights.ab, unit: 'mg/L', inv: true },
+        { name: 'Water Reuse Rate', val: store.reuse, med: medians.reuse, norm: store.results.norm.reuse, weight: store.weights.reuse, unit: '%' },
+        { name: 'Regulatory Compliance', val: store.compliance, med: medians.comp, norm: store.results.norm.comp, weight: store.weights.comp, unit: 'pts' }
+      ];
+
+      let tableHtml = '';
+      kpis.forEach(k => {
+        const delta = k.inv ? k.med - k.val : k.val - k.med;
+        const deltaColor = delta >= 0 ? 'var(--green)' : 'var(--red)';
+        const contribution = (k.norm * k.weight).toFixed(1);
+        const risk = k.norm > 80 ? 'low' : k.norm > 50 ? 'mod' : 'elevated';
+        
+        tableHtml += `
+          <tr>
+            <td style="font-weight:700; color:var(--navy);">${k.name}</td>
+            <td class="tabular-nums">${k.val.toFixed(1)} ${k.unit}</td>
+            <td class="tabular-nums" style="color:var(--text-muted);">${k.med.toFixed(1)}</td>
+            <td class="tabular-nums" style="color:${deltaColor}; font-weight:700;">${delta > 0 ? '+' : ''}${delta.toFixed(1)}</td>
+            <td class="tabular-nums">${k.norm.toFixed(1)}</td>
+            <td class="tabular-nums">${(k.weight * 100).toFixed(0)}%</td>
+            <td class="tabular-nums" style="font-weight:700;">${contribution}</td>
+            <td><span class="risk-tag ${risk}">${risk}</span></td>
+          </tr>
+        `;
+      });
+      document.getElementById('decomp_body').innerHTML = tableHtml;
+
+      // ─── RISK QUADRANT MAPPING ───
+      const matX = 100 - store.compliance; // Regulatory Exposure
+      const matY = store.results.ops; // Operational Scoring
+      
+      const spot = document.getElementById('risk_matrix_spot');
+      // Map matX (0-100) to left (0-100%) and matY (0-100) to bottom (0-100%)
+      spot.style.left = Math.min(95, Math.max(5, matX)) + '%';
+      spot.style.bottom = Math.min(95, Math.max(5, matY)) + '%';
+      spot.style.top = 'auto'; // Reset top from previous simple matrix
+
+      // Updated matX/matY logic handled above in Quadrant Mapping
+
+      // ─── CHARTS UPDATE ───
+      if (radarChart && radarChart.data) {
+        radarChart.data.datasets[0].data = [store.results.norm.api, store.results.norm.ab, store.results.norm.reuse, store.results.norm.comp];
+        radarChart.update();
+      }
+
+      // Update Marginal Abatement (Tornado) Chart
+      const marginals = [
+        (store.weights.api * 10), // +10% API Opt
+        (store.weights.ab * 10),  // +10% AB Opt
+        (store.weights.reuse * 10), // +10% Reuse Opt
+        (store.weights.comp * 10)   // +10% Comp Opt
+      ];
+      if (tornadoChart && tornadoChart.data) {
+        tornadoChart.data.datasets[0].data = marginals;
+        tornadoChart.update();
+      }
+
+      // Projection Model (Linear Simplification)
+      const projData = [ops];
+      for (let i = 1; i <= 5; i++) {
+        const nextApi = Math.max(0, store.api * Math.pow(1 - store.projection.apiRate/100, i));
+        const nextReuse = Math.min(100, store.reuse * Math.pow(1 + store.projection.waterRate/100, i));
+        
+        const nApi = Math.max(0, 100 - (nextApi / 50 * 100));
+        const nReuse = Math.min(100, nextReuse);
+        
+        const nextOps = (nApi * store.weights.api) +
+                        (store.results.norm.ab * store.weights.ab) +
+                        (nReuse * store.weights.reuse) +
+                        (store.results.norm.comp * store.weights.comp);
+        projData.push(Math.round(nextOps * 10) / 10);
+      }
+      if (projectionChart) {
+        projectionChart.data.datasets[0].data = projData;
+        projectionChart.update();
+      }
+
+      updateScenarioUI();
+    }
+
+    function updateScenarioUI() {
+      const baseline = { ops: 68.5, margin: 250, spending: 12.5 };
+      const scenarioOps = store.results.ops;
+      const scenarioAdjust = store.results.adjustment;
+      const scenarioMargin = store.baseMargin + scenarioAdjust;
+      const scenarioSpending = scenarioMargin * (store.loan * 10000) / 1000000; // Simplified interest calc
+
+      // Visual Bridge: OPS
+      const opsDiff = scenarioOps - baseline.ops;
+      const bridgeOpsVal = document.getElementById('bridge_ops_val');
+      bridgeOpsVal.textContent = scenarioOps.toFixed(1);
+      document.getElementById('bridge_ops_progress').style.width = scenarioOps + '%';
+      
+      const opsDiffEl = document.getElementById('bridge_ops_diff');
+      opsDiffEl.textContent = (opsDiff >= 0 ? '+' : '') + opsDiff.toFixed(1) + ' pts improvement';
+      opsDiffEl.style.color = opsDiff >= 0 ? 'var(--green)' : 'var(--red)';
+      
+      const opsStatus = document.getElementById('bridge_ops_status');
+      opsStatus.textContent = scenarioOps > 80 ? 'Elite' : scenarioOps > 70 ? 'Strategic' : 'Neutral';
+      opsStatus.className = 'risk-tag ' + (scenarioOps > 70 ? 'low' : 'mod');
+
+      // Visual Bridge: Interest
+      const baselineInterest = 12.5;
+      const simulatedInterest = scenarioSpending;
+      const interestDiff = simulatedInterest - baselineInterest;
+      
+      document.getElementById('bridge_interest_val').textContent = '$' + simulatedInterest.toFixed(1) + 'M';
+      const intDiffEl = document.getElementById('bridge_interest_diff');
+      intDiffEl.textContent = (interestDiff <= 0 ? '' : '+') + '$' + interestDiff.toFixed(1) + 'M Annual ' + (interestDiff <= 0 ? 'Savings' : 'Cost');
+      intDiffEl.style.color = interestDiff <= 0 ? 'var(--green)' : 'var(--red)';
+
+      // Financial Sensitivity: Cockpit Readouts
+      document.getElementById('cockpit_prob_display').textContent = store.simParams.prob + '%';
+      document.getElementById('cockpit_capex_display').textContent = '$' + store.simParams.capex.toFixed(1) + 'M';
+      document.getElementById('cockpit_discount_display').textContent = store.simParams.discount.toFixed(1) + '%';
+
+      // Expected Spread
+      const prob = store.simParams.prob / 100;
+      const regShockSpread = 25; 
+      const expectedSpread = Math.round(prob * regShockSpread);
+      document.getElementById('expected_spread').textContent = '+' + expectedSpread + ' bps';
+
+      // Advisor Lab & NPV
+      const capex = store.simParams.capex;
+      const savings = (baselineInterest - simulatedInterest); // Yearly savings
+      const rate = store.simParams.discount / 100;
+      
+      let npv = -capex;
+      for (let t = 1; t <= 5; t++) {
+        npv += savings / Math.pow(1 + rate, t);
+      }
+      
+      const npvEl = document.getElementById('npv_display');
+      npvEl.textContent = (npv >= 0 ? '$' : '-$') + Math.abs(npv).toFixed(1) + 'M';
+      npvEl.style.color = npv >= 0 ? '#10B981' : '#EF4444';
+      
+      const npvStatus = document.getElementById('npv_status');
+      npvStatus.textContent = npv >= 0 ? 'VIABLE' : 'SUB-OPTIMAL';
+      npvStatus.className = 'risk-tag ' + (npv >= 0 ? 'low' : 'elevated');
+
+      // Payback Period
+      const monthsToPayback = savings > 0 ? Math.round((capex / savings) * 12) : 'N/A';
+      document.getElementById('breakeven_display').textContent = monthsToPayback + (savings > 0 ? ' Months' : '');
+
+      // Impact Trajectory Chart Update
+      if (impactTrajectoryChart && impactTrajectoryChart.data) {
+        const trajData = [baseline.ops];
+        for (let i = 1; i <= 5; i++) {
+            // Simplified trajectory: baseline ops + linear improvement based on scenario diff
+            const step = (scenarioOps - baseline.ops) / 5;
+            trajData.push(Math.round((baseline.ops + (step * i)) * 10) / 10);
+        }
+        impactTrajectoryChart.data.datasets[1].data = trajData;
+        impactTrajectoryChart.update();
+      }
+
+      // Dynamic Recommendation
+      const rec = document.getElementById('strat_recommendation');
+      if (store.scenario === 'circular') {
+        rec.innerHTML = "Scenario transition to **Circular Operations** yields the highest risk-adjusted return on capital. NPV is maximized via water reuse synergies.";
+      } else if (scenarioOps < 60) {
+        rec.innerHTML = "Facility is currently in **Risk Territory**. Strategic recommendation: Immediate investment in **Advanced Filtration** to avoid regulatory spread penalties.";
+      } else if (npv > 2) {
+        rec.innerHTML = "Investment profile is **Strongly Positive**. High conviction buy-in for ESG upgrades. Projected payback is efficient at " + monthsToPayback + " months.";
+      } else {
+        rec.innerHTML = "Baseline positioning remains **Stable**. Recommend continuous R&D investment to maintain the current -25bps margin ratchet elasticity.";
+      }
+    }
+
+    function focusFacility(name) {
+      const site = FACILITIES.find(f => f.name === name);
+      if (site && site.marker) {
+        map.flyTo(site.coords, 4);
+        site.marker.openPopup();
+      }
+    }
+
+    function applyScenario(type) {
+      store.scenario = type;
+      if (type === 'treatment') {
+        store.api = 8.0; store.ab = 4.0; store.compliance = 85;
+      } else if (type === 'regulatory') {
+        store.thresholds.api = 10; store.thresholds.ab = 5; store.compliance = 55;
+      } else if (type === 'circular') {
+        store.reuse = 95; store.api = 5.0;
+      } else if (type === 'water') {
+        store.reuse = 15; store.compliance = 65;
+      } else {
+        // baseline
+        store.api = 15.0; store.ab = 8.0; store.reuse = 45; store.compliance = 70;
+      }
+      
+      // Update UI inputs to match scenario
+      document.getElementById('api_val').value = store.api;
+      document.getElementById('ab_val').value = store.ab;
+      document.getElementById('reuse_val').value = store.reuse;
+      document.getElementById('comp_val').value = store.compliance;
+      
+      calculate();
+    }
+
+    // ─── EVENT HANDLERS ──────────────────────────────────────────────────────
+    function bindEvents() {
+      // Tab switching
+      document.querySelectorAll('.tab-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+      });
+
+      // Inputs
+      const inputs = {
+        api_val: 'api', ab_val: 'ab', reuse_val: 'reuse', comp_val: 'compliance', loan_val: 'loan'
+      };
+      Object.entries(inputs).forEach(([id, key]) => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          store[key] = parseFloat(e.target.value) || 0;
+          calculate();
+        });
+      });
+
+      // Optimization Roadmap Sliders (Technical Hub)
+      ['proj_api_rate', 'proj_water_rate'].forEach(id => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          const val = parseFloat(e.target.value) || 0;
+          if (id === 'proj_api_rate') store.projection.apiRate = val;
+          if (id === 'proj_water_rate') store.projection.waterRate = val;
+          calculate();
+        });
+      });
+
+      // Advanced Technical Inputs
+      document.getElementById('elasticity_coeff').addEventListener('input', (e) => {
+        store.elasticity.coeff = parseFloat(e.target.value) || 0;
+        calculate();
+      });
+      document.getElementById('pivot_score').addEventListener('input', (e) => {
+        store.elasticity.pivot = parseFloat(e.target.value) || 60;
+        calculate();
+      });
+      document.getElementById('proj_api_rate').addEventListener('input', (e) => {
+        store.projection.apiRate = parseFloat(e.target.value) || 0;
+        calculate();
+      });
+      document.getElementById('proj_water_rate').addEventListener('input', (e) => {
+        store.projection.waterRate = parseFloat(e.target.value) || 0;
+        calculate();
+      });
+
+      // Scenario Cards
+      document.querySelectorAll('.scenario-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          applyScenario(card.dataset.scenario);
+          calculate();
+        });
+      });
+
+      // Simulator Inputs
+      ['prob_val', 'sim_capex', 'sim_discount'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value) || 0;
+            if (id === 'prob_val') store.simParams.prob = val;
+            if (id === 'sim_capex') store.simParams.capex = val;
+            if (id === 'sim_discount') store.simParams.discount = val;
+            updateScenarioUI();
+          });
+        }
+      });
+
+      // Special handling for Map tab initialization (Leaflet needs resize on first view)
+      document.querySelector('[data-tab="map"]').addEventListener('click', () => {
+        setTimeout(() => map.invalidateSize(), 100);
+      });
+    }
+
+    // ─── INIT ────────────────────────────────────────────────────────────────
+    window.onload = () => {
+      initCharts();
+      initMap();
+      bindEvents();
+      calculate();
+    };
+  </script>
+
+</body>
+</html>
